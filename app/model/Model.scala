@@ -35,12 +35,12 @@ object GitHubUser {
     ) (GitHubUser.apply _)
 }
 
-case class ReviewComment(commentBody: String, user: GitHubUser)
+case class Comment(commentBody: String, user: GitHubUser)
 
-object ReviewComment {
+object Comment {
 
-  implicit val commentReads: Reads[ReviewComment] = (
+  implicit val commentReads: Reads[Comment] = (
     (JsPath \ "body").read[String] and
       (JsPath \ "user").read[GitHubUser]
-    ) (ReviewComment.apply _)
+    ) (Comment.apply _)
 }

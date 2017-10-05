@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.util.Timeout
 import model.PullRequestAction._
-import model.{PullRequestAction, ReviewComment}
+import model.{PullRequestAction, Comment}
 import play.api.Logger
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -30,7 +30,7 @@ class WebhookController @Inject()(cc: ControllerComponents,
     request.body.asJson.map(json => json.as[PullRequestAction]) match {
       case Some(pullRequestAction) =>
         (commentsRetriever ? Retrieve(pullRequestAction.pullRequest.commentsUrl))
-          .mapTo[Seq[ReviewComment]]
+          .mapTo[Seq[Comment]]
           .map(comments => {
             val commentString = comments.filter(comment => comment.user == pullRequestAction.pullRequest.user)
               .filter(comment => comment.commentBody.startsWith("hero"))
