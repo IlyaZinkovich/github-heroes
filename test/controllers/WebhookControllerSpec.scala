@@ -1,15 +1,15 @@
 package controllers
 
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, stubFor, urlEqualTo}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
 
 class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with BeforeAndAfterEach {
 
@@ -91,7 +91,7 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
     Json.obj(
       "id" -> testUserId,
       "login" -> testUserLogin,
-      "testUserAvatarUrl" -> testUserAvatar
+      "avatar_url" -> testUserAvatar
     )
   }
 }

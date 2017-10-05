@@ -3,8 +3,11 @@ package controllers
 import javax.inject.{Inject, Singleton}
 
 import akka.util.Timeout
+import model.PullRequestAction._
+import model.ReviewComment._
+import model.{PullRequestAction, ReviewComment}
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 
@@ -18,15 +21,16 @@ class WebhookController @Inject()(cc: ControllerComponents, client: WSClient)
   private implicit val timeout: Timeout = 5.seconds
 
   def webhook() = Action.async { implicit request: Request[AnyContent] =>
-    request.body.asJson.map(json => (json \ "pull_request" \ "comments_url").as[String]) match {
-      case Some(commentsUrl) => client.url(commentsUrl).get().map(reviewComments => {
-        val heroComment = Json.parse(reviewComments.body).as[Seq[JsValue]]
-          .filter(comment => (comment \ "user" \ "id").as[String] == "testUserId")
-          .filter(comment => (comment \ "body").as[String].startsWith("hero"))
-          .map(comment => (comment \ "body").as[String]).mkString
-        Logger.debug(heroComment)
-        Ok
-      })
+    request.body.asJson.map(json => json.as[PullRequestAction]) match {
+      case Some(pullRequestAction) => client.url(pullRequestAction.pullRequest.commentsUrl).get()
+        .map(reviewComments => {
+          val heroComment = Json.parse(reviewComments.body).as[Seq[ReviewComment]]
+            .filter(comment => comment.user == pullRequestAction.pullRequest.user)
+            .filter(comment => comment.commentBody.startsWith("hero"))
+            .map(comment => comment.commentBody).mkString
+          Logger.debug(heroComment)
+          Ok
+        })
       case None => Future(NoContent)
     }
   }
