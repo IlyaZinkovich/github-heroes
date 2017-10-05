@@ -1,7 +1,7 @@
 package model
 
-import play.api.libs.json.{JsPath, Reads}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads}
 
 case class PullRequestAction(action: String, pullRequest: PullRequest)
 
@@ -24,12 +24,12 @@ object PullRequest {
     ) (PullRequest.apply _)
 }
 
-case class GitHubUser(userId: String, userLogin: String, userAvatar: String)
+case class GitHubUser(userId: Int, userLogin: String, userAvatar: String)
 
 object GitHubUser {
 
   implicit val gitHubUserReads: Reads[GitHubUser] = (
-    (JsPath \ "id").read[String] and
+    (JsPath \ "id").read[Int] and
       (JsPath \ "login").read[String] and
       (JsPath \ "avatar_url").read[String]
     ) (GitHubUser.apply _)

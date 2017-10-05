@@ -2,8 +2,7 @@ package actors
 
 import actors.PullRequestActionHandler.CommentsRetrieved
 import akka.actor.{Actor, Props}
-import akka.pattern.pipe
-import model.{Comment, PullRequest, PullRequestAction}
+import model.{Comment, PullRequest}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 
@@ -14,9 +13,13 @@ class CommentsRetriever(client: WSClient) extends Actor {
   private implicit val ec = context.dispatcher
 
   def receive = {
-    case Retrieve(pullRequest) => client.url(pullRequest.commentsUrl).get()
-      .map(commentsResponse => Json.parse(commentsResponse.body).as[Seq[Comment]])
-      .foreach(comments => sender ! CommentsRetrieved(pullRequest, comments))
+    case Retrieve(pullRequest) =>
+      val originalSender = sender()
+      client.url(pullRequest.commentsUrl).get()
+        .map(commentsResponse => Json.parse(commentsResponse.body).as[Seq[Comment]])
+        .foreach(comments => {
+          originalSender ! CommentsRetrieved(pullRequest, comments)
+        })
   }
 }
 

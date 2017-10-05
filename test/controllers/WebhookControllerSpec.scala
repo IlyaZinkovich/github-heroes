@@ -31,7 +31,7 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
     "react on closed pull requests" in {
       val action = "closed"
       val isMerged = true
-      val userId = "testUserId"
+      val userId = 1
       val userLogin = "testUserLogin"
       val userAvatar = "https://avatars3.githubusercontent.com/u/0000000?v=4"
       val contentTypeHeader = ("Content", "application/json")
@@ -40,7 +40,7 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
       val gitHubUserJson = gitHubUser(userId, userLogin, userAvatar)
       val commentBody = "comment body"
       val heroCommentBody = "hero 10"
-      val otherUserId = "anotherTestUserId"
+      val otherUserId = 2
       val otherUserLogin = "anotherTestUserLogin"
       val otherUserAvatar = "https://avatars3.githubusercontent.com/u/1111111?v=4"
       val regularComment = reviewComment(gitHubUser(userId, userLogin, userAvatar), commentBody)
@@ -87,7 +87,7 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
     )
   }
 
-  private def gitHubUser(testUserId: String, testUserLogin: String, testUserAvatar: String) = {
+  private def gitHubUser(testUserId: Int, testUserLogin: String, testUserAvatar: String) = {
     Json.obj(
       "id" -> testUserId,
       "login" -> testUserLogin,
