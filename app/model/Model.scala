@@ -5,13 +5,14 @@ import java.time.Instant
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads}
 
-case class PullRequestAction(action: String, pullRequest: PullRequest)
+case class PullRequestAction(action: String, pullRequest: PullRequest, repo: GitHubRepo)
 
 object PullRequestAction {
 
   implicit val pullRequestActionReads: Reads[PullRequestAction] = (
     (JsPath \ "action").read[String] and
-      (JsPath \ "pull_request").read[PullRequest]
+      (JsPath \ "pull_request").read[PullRequest] and
+      (JsPath \ "repository").read[GitHubRepo]
     ) (PullRequestAction.apply _)
 }
 
@@ -24,6 +25,21 @@ object PullRequest {
       (JsPath \ "comments_url").read[String] and
       (JsPath \ "merged_by").read[GitHubUser]
     ) (PullRequest.apply _)
+}
+
+case class GitHubRepo(id: Int, name: String, url: String,
+                      starsCount: Int, forksCount: Int, watchersCount: Int)
+
+object GitHubRepo {
+
+  implicit val githubRepoReads: Reads[GitHubRepo] = (
+    (JsPath \ "id").read[Int] and
+      (JsPath \ "full_name").read[String] and
+      (JsPath \ "html_url").read[String] and
+      (JsPath \ "stargazers_count").read[Int] and
+      (JsPath \ "forks").read[Int] and
+      (JsPath \ "watchers").read[Int]
+    ) (GitHubRepo.apply _)
 }
 
 case class GitHubUser(userId: Int, userLogin: String, userAvatarUrl: String)
@@ -48,7 +64,4 @@ object Comment {
 }
 
 case class Badge(name: String, imageUrl: String, from: GitHubUser, to: GitHubUser,
-                 timestamp: Instant, repository: Repository)
-
-case class Repository(id: Int, name: String, url: String,
-                      starsCount: Int, forksCount: Int, watchersCount: Int)
+                 timestamp: Instant, repository: GitHubRepo)

@@ -20,13 +20,13 @@ class PullRequestActionHandler(client: WSClient, badgeRepository: BadgeRepositor
 
   def receive = {
     case HandlePullRequestAction(pullRequestAction) =>
-      commentsRetriever ! Retrieve(pullRequestAction.pullRequest)
-    case CommentsRetrieved(pullRequest, comments) =>
-      heroCommentsDetector ! DetectHeroComment(pullRequest, comments)
-    case HeroComment(pullRequest, comment) =>
-      val from = pullRequest.user
-      val to = pullRequest.user
-      val repo = Repository(1, "repo", "http://repo.url", 1, 2, 3)
+      commentsRetriever ! Retrieve(pullRequestAction)
+    case CommentsRetrieved(pullRequestAction, comments) =>
+      heroCommentsDetector ! DetectHeroComment(pullRequestAction, comments)
+    case HeroComment(pullRequestAction, comment) =>
+      val from = comment.user
+      val to = pullRequestAction.pullRequest.user
+      val repo = pullRequestAction.repo
       val badgeName = "regular"
       val badgeImageUrl = "http://img.png"
       val timestamp = Instant.now()
@@ -41,8 +41,8 @@ object PullRequestActionHandler {
 
   case class HandlePullRequestAction(pullRequestAction: PullRequestAction)
 
-  case class CommentsRetrieved(pullRequest: PullRequest, comments: Seq[Comment])
+  case class CommentsRetrieved(pullRequestAction: PullRequestAction, comments: Seq[Comment])
 
-  case class HeroComment(pullRequest: PullRequest, comment: Comment)
+  case class HeroComment(pullRequestAction: PullRequestAction, comment: Comment)
 
 }

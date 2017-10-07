@@ -2,18 +2,18 @@ package actors
 
 import actors.PullRequestActionHandler.HeroComment
 import akka.actor.{Actor, Props}
-import model.{Comment, PullRequest}
+import model.{Comment, PullRequest, PullRequestAction}
 
 class HeroCommentsDetector extends Actor {
 
   import HeroCommentsDetector._
 
   def receive = {
-    case DetectHeroComment(pullRequest, comments) =>
+    case DetectHeroComment(pullRequestAction, comments) =>
       val originalSender = sender()
-      comments.filter(userMatchesReviewer(_, pullRequest))
+      comments.filter(userMatchesReviewer(_, pullRequestAction.pullRequest))
         .find(commentStartsWithHero)
-        .foreach(heroComment => originalSender ! HeroComment(pullRequest, heroComment))
+        .foreach(heroComment => originalSender ! HeroComment(pullRequestAction, heroComment))
   }
 
   def userMatchesReviewer(comment: Comment, pullRequest: PullRequest): Boolean = {
@@ -29,6 +29,6 @@ object HeroCommentsDetector {
 
   def props: Props = Props(new HeroCommentsDetector)
 
-  case class DetectHeroComment(pullRequest: PullRequest, comments: Seq[Comment])
+  case class DetectHeroComment(pullRequestAction: PullRequestAction, comments: Seq[Comment])
 
 }

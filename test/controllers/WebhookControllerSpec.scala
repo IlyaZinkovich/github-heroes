@@ -47,6 +47,7 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
       val heroComment = reviewComment(gitHubUser(userId, userLogin, userAvatar), heroCommentBody)
       val otherUserComment = reviewComment(gitHubUser(otherUserId, otherUserLogin, otherUserAvatar), commentBody)
       val fakeHeroComment = reviewComment(gitHubUser(otherUserId, otherUserLogin, otherUserAvatar), heroCommentBody)
+      val repo = gitHubRepo(1, "1", "http://1", 1, 2, 3)
 
       stubFor(get(urlEqualTo(s"/$commentsPath"))
         .willReturn(
@@ -58,7 +59,7 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
 
       val webhookResponse = route(app, FakeRequest(POST, "/")
         .withHeaders(contentTypeHeader)
-        .withJsonBody(buildPullRequestWebhookPayload(action, isMerged, gitHubUserJson, commentsUrl)))
+        .withJsonBody(buildPullRequestWebhookPayload(action, isMerged, gitHubUserJson, commentsUrl, repo)))
         .get
 
       status(webhookResponse) mustBe OK
@@ -76,14 +77,16 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
   private def buildPullRequestWebhookPayload(action: String,
                                              isMerged: Boolean,
                                              gitHubUser: JsValue,
-                                             commentsUrl: String) = {
+                                             commentsUrl: String,
+                                             gitHubRepo: JsValue) = {
     Json.obj(
       "action" -> action,
       "pull_request" -> Json.obj(
         "merged" -> isMerged,
         "merged_by" -> gitHubUser,
         "comments_url" -> commentsUrl
-      )
+      ),
+      "repository" -> gitHubRepo
     )
   }
 
@@ -92,6 +95,17 @@ class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with Before
       "id" -> testUserId,
       "login" -> testUserLogin,
       "avatar_url" -> testUserAvatar
+    )
+  }
+
+  private def gitHubRepo(id: Int, name: String, url: String, stars: Int, forks: Int, watchers: Int) = {
+    Json.obj(
+      "id" -> id,
+      "full_name" -> name,
+      "html_url" -> url,
+      "stargazers_count" -> stars,
+      "forks" -> forks,
+      "watchers" -> watchers
     )
   }
 }

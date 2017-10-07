@@ -5,7 +5,7 @@ import java.time.Instant
 import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
 import com.amazonaws.services.dynamodbv2.document.{DynamoDB, PrimaryKey}
-import model.{Badge, GitHubUser, Repository}
+import model.{Badge, GitHubRepo, GitHubUser}
 import org.scalatest.WordSpecLike
 import play.api.Configuration
 import repository.dynamo.BadgeDynamoRepository
@@ -26,7 +26,7 @@ class BadgesDynamoRepositoryITSpec extends WordSpecLike {
     "persist badges" in {
       val from = GitHubUser(1, "1", "1.img")
       val to = GitHubUser(2, "2", "2.img")
-      val repo = Repository(1, "repo", "http://repo.url", 1, 2, 3)
+      val repo = GitHubRepo(1, "repo", "http://repo.url", 1, 2, 3)
       val badgeName = "awesome"
       val badgeImageUrl = "http://img.png"
       val timestamp = Instant.now()
