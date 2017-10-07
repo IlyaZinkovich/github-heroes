@@ -32,5 +32,3 @@ object HeroCommentsDetector {
   case class DetectHeroComment(pullRequest: PullRequest, comments: Seq[Comment])
 
 }
-
-

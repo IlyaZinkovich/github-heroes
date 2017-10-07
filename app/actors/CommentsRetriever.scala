@@ -17,9 +17,7 @@ class CommentsRetriever(client: WSClient) extends Actor {
       val originalSender = sender()
       client.url(pullRequest.commentsUrl).get()
         .map(commentsResponse => Json.parse(commentsResponse.body).as[Seq[Comment]])
-        .foreach(comments => {
-          originalSender ! CommentsRetrieved(pullRequest, comments)
-        })
+        .foreach(comments => originalSender ! CommentsRetrieved(pullRequest, comments))
   }
 }
 
