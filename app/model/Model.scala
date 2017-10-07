@@ -1,5 +1,7 @@
 package model
 
+import java.time.Instant
+
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads}
 
@@ -44,3 +46,9 @@ object Comment {
       (JsPath \ "user").read[GitHubUser]
     ) (Comment.apply _)
 }
+
+case class Badge(name: String, imageUrl: String, from: GitHubUser, to: GitHubUser,
+                 timestamp: Instant, repository: Repository)
+
+case class Repository(id: Int, name: String, url: String,
+                      starsCount: Int, forksCount: Int, watchersCount: Int)

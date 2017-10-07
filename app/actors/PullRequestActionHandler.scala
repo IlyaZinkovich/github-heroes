@@ -1,10 +1,12 @@
 package actors
 
+import java.time.Instant
+
 import actors.CommentsRetriever.Retrieve
-import actors.HeroBadgePersister.{HeroBadge, PersistHeroBadge}
+import actors.BadgePersister.PersistBadge
 import actors.HeroCommentsDetector.DetectHeroComment
 import akka.actor.{Actor, Props}
-import model.{Comment, PullRequest, PullRequestAction}
+import model._
 import play.api.Logger
 import play.api.libs.ws.WSClient
 
@@ -14,16 +16,21 @@ class PullRequestActionHandler(client: WSClient) extends Actor {
 
   private val commentsRetriever = context.actorOf(CommentsRetriever.props(client), "comments-retriever")
   private val heroCommentsDetector = context.actorOf(HeroCommentsDetector.props, "hero-comments-detector")
-  private val heroBadgePersister = context.actorOf(HeroBadgePersister.props, "hero-badge-persister")
+  private val badgePersister = context.actorOf(BadgePersister.props, "badge-persister")
 
   def receive = {
     case HandlePullRequestAction(pullRequestAction) =>
-      Logger.debug(sender().toString())
       commentsRetriever ! Retrieve(pullRequestAction.pullRequest)
     case CommentsRetrieved(pullRequest, comments) =>
       heroCommentsDetector ! DetectHeroComment(pullRequest, comments)
     case HeroComment(pullRequest, comment) =>
-      heroBadgePersister ! PersistHeroBadge(HeroBadge("regular", 10, "/"), pullRequest.user, pullRequest.user)
+      val from = pullRequest.user
+      val to = pullRequest.user
+      val repo = Repository(1, "repo", "http://repo.url", 1, 2, 3)
+      val badgeName = "regular"
+      val badgeImageUrl = "http://img.png"
+      val timestamp = Instant.now()
+      badgePersister ! PersistBadge(Badge(badgeName, badgeImageUrl, from, to, timestamp, repo))
   }
 }
 
