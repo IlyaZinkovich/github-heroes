@@ -26,7 +26,7 @@ object PullRequest {
     ) (PullRequest.apply _)
 }
 
-case class GitHubUser(userId: Int, userLogin: String, userAvatar: String)
+case class GitHubUser(userId: Int, userLogin: String, userAvatarUrl: String)
 
 object GitHubUser {
 

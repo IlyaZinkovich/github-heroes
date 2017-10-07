@@ -2,21 +2,21 @@ package actors
 
 import java.time.Instant
 
-import actors.CommentsRetriever.Retrieve
 import actors.BadgePersister.PersistBadge
+import actors.CommentsRetriever.Retrieve
 import actors.HeroCommentsDetector.DetectHeroComment
 import akka.actor.{Actor, Props}
 import model._
-import play.api.Logger
 import play.api.libs.ws.WSClient
+import repository.BadgeRepository
 
-class PullRequestActionHandler(client: WSClient) extends Actor {
+class PullRequestActionHandler(client: WSClient, badgeRepository: BadgeRepository) extends Actor {
 
   import PullRequestActionHandler._
 
   private val commentsRetriever = context.actorOf(CommentsRetriever.props(client), "comments-retriever")
   private val heroCommentsDetector = context.actorOf(HeroCommentsDetector.props, "hero-comments-detector")
-  private val badgePersister = context.actorOf(BadgePersister.props, "badge-persister")
+  private val badgePersister = context.actorOf(BadgePersister.props(badgeRepository), "badge-persister")
 
   def receive = {
     case HandlePullRequestAction(pullRequestAction) =>
@@ -36,7 +36,8 @@ class PullRequestActionHandler(client: WSClient) extends Actor {
 
 object PullRequestActionHandler {
 
-  def props(client: WSClient): Props = Props(new PullRequestActionHandler(client))
+  def props(client: WSClient, badgeRepository: BadgeRepository): Props =
+    Props(new PullRequestActionHandler(client, badgeRepository))
 
   case class HandlePullRequestAction(pullRequestAction: PullRequestAction)
 
