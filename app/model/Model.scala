@@ -3,7 +3,7 @@ package model
 import java.time.Instant
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads}
+import play.api.libs.json.{JsPath, Reads, Writes}
 
 case class PullRequestAction(action: String, pullRequest: PullRequest, repo: GitHubRepo)
 
@@ -40,6 +40,15 @@ object GitHubRepo {
       (JsPath \ "forks").read[Int] and
       (JsPath \ "watchers").read[Int]
     ) (GitHubRepo.apply _)
+
+  implicit val gitHubRepoWrites: Writes[GitHubRepo] = (
+    (JsPath \ "id").write[Int] and
+      (JsPath \ "full_name").write[String] and
+      (JsPath \ "html_url").write[String] and
+      (JsPath \ "stargazers_count").write[Int] and
+      (JsPath \ "forks").write[Int] and
+      (JsPath \ "watchers").write[Int]
+    ) (unlift(GitHubRepo.unapply))
 }
 
 case class GitHubUser(userId: Int, userLogin: String, userAvatarUrl: String)
@@ -51,6 +60,12 @@ object GitHubUser {
       (JsPath \ "login").read[String] and
       (JsPath \ "avatar_url").read[String]
     ) (GitHubUser.apply _)
+
+  implicit val gitHubUserWrites: Writes[GitHubUser] = (
+    (JsPath \ "id").write[Int] and
+      (JsPath \ "login").write[String] and
+      (JsPath \ "avatar_url").write[String]
+    ) (unlift(GitHubUser.unapply))
 }
 
 case class Comment(commentBody: String, user: GitHubUser)
@@ -65,3 +80,15 @@ object Comment {
 
 case class Badge(name: String, imageUrl: String, from: GitHubUser, to: GitHubUser,
                  timestamp: Instant, repository: GitHubRepo)
+
+object Badge {
+
+  implicit val badgeWrites: Writes[Badge] = (
+    (JsPath \ "name").write[String] and
+      (JsPath \ "image_url").write[String] and
+      (JsPath \ "from").write[GitHubUser] and
+      (JsPath \ "to").write[GitHubUser] and
+      (JsPath \ "timestamp").write[Instant] and
+      (JsPath \ "repository").write[GitHubRepo]
+    ) (unlift(Badge.unapply))
+}
