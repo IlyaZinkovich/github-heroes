@@ -28,7 +28,7 @@ class PullRequestActionHandler(client: WSClient, badgeRepository: BadgeRepositor
       val to = pullRequestAction.pullRequest.requestedBy
       val repo = pullRequestAction.repo
       val badgeName = comment.commentBody.replaceFirst("hero ", "")
-      val badgeImageUrl = ""
+      val badgeImageUrl = "/assets/images/badge.png"
       val timestamp = Instant.now()
       badgePersister ! PersistBadge(Badge(badgeName, badgeImageUrl, from, to, timestamp, repo))
   }
