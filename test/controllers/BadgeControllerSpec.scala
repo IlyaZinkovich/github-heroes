@@ -1,11 +1,10 @@
 package controllers
 
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Injecting}
 
-class BadgeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+class BadgeControllerSpec extends PlaySpec with TestAppConfig {
 
   "BadgeController" should {
 
