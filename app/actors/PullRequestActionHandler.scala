@@ -20,15 +20,15 @@ class PullRequestActionHandler(client: WSClient, badgeRepository: BadgeRepositor
 
   def receive = {
     case HandlePullRequestAction(pullRequestAction) =>
-      commentsRetriever ! Retrieve(pullRequestAction)
+      if (pullRequestAction.action == "closed") commentsRetriever ! Retrieve(pullRequestAction)
     case CommentsRetrieved(pullRequestAction, comments) =>
       heroCommentsDetector ! DetectHeroComment(pullRequestAction, comments)
     case HeroComment(pullRequestAction, comment) =>
       val from = comment.user
-      val to = pullRequestAction.pullRequest.user
+      val to = pullRequestAction.pullRequest.requestedBy
       val repo = pullRequestAction.repo
-      val badgeName = "regular"
-      val badgeImageUrl = "http://img.png"
+      val badgeName = comment.commentBody.replaceFirst("hero ", "")
+      val badgeImageUrl = ""
       val timestamp = Instant.now()
       badgePersister ! PersistBadge(Badge(badgeName, badgeImageUrl, from, to, timestamp, repo))
   }

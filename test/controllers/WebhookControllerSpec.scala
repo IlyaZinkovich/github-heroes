@@ -83,6 +83,7 @@ class WebhookControllerSpec extends PlaySpec with TestAppConfig with BeforeAndAf
       "pull_request" -> Json.obj(
         "merged" -> isMerged,
         "merged_by" -> gitHubUser,
+        "user" -> gitHubUser,
         "comments_url" -> commentsUrl
       ),
       "repository" -> gitHubRepo
