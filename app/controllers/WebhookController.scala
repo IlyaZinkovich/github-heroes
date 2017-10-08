@@ -8,6 +8,8 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import model.PullRequestAction
 import model.PullRequestAction._
+import play.api.Logger
+import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import repository.BadgeRepository
@@ -28,6 +30,9 @@ class WebhookController @Inject()(cc: ControllerComponents,
     actorSystem.actorOf(PullRequestActionHandler.props(client, badgeRepository), "pr-handler")
 
   def webhook() = Action { implicit request: Request[AnyContent] =>
+    request.body.asJson match {
+      case Some(value) => Logger.debug(value.toString())
+    }
     request.body.asJson.map(json => json.as[PullRequestAction]) match {
       case Some(pullRequestAction) =>
         pullRequestActionHandler ! HandlePullRequestAction(pullRequestAction)
