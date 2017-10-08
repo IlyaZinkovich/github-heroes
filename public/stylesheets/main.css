@@ -12,3 +12,7 @@
 .badge h3 {
   display: inline-block;
 }
+
+body {
+  padding: 10px;
+}
