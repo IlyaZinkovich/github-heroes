@@ -3,10 +3,10 @@ package controllers
 import javax.inject.{Inject, Singleton}
 
 import model.Badge
+import model.Badge._
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
 import repository.BadgeRepository
-import Badge._
 
 @Singleton
 class BadgeController @Inject()(cc: ControllerComponents,

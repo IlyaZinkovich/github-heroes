@@ -6,12 +6,11 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, stubFor,
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.libs.json.{JsArray, JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class WebhookControllerSpec extends PlaySpec with GuiceOneAppPerTest with BeforeAndAfterEach {
+class WebhookControllerSpec extends PlaySpec with TestAppConfig with BeforeAndAfterEach {
 
   val wireMockHost = "localhost"
   val wireMockPort = 8888

@@ -2,23 +2,15 @@ package repository
 
 import java.time.Instant
 
-import com.amazonaws.client.builder.AwsClientBuilder
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
-import com.amazonaws.services.dynamodbv2.document.{DynamoDB, PrimaryKey}
 import model.{Badge, GitHubRepo, GitHubUser}
 import org.scalatest.WordSpecLike
 import play.api.Configuration
-import repository.dynamo.BadgeDynamoRepository
+import repository.dynamo.{BadgeDynamoRepository, LocalDynamo}
 
 class BadgesDynamoRepositoryITSpec extends WordSpecLike {
 
   private val dynamoEndpoint = "http://localhost:8000"
   private val dynamoRegion = "eu-central-1"
-  private val endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(dynamoEndpoint, dynamoRegion)
-  private val client = AmazonDynamoDBClientBuilder.standard()
-    .withEndpointConfiguration(endpointConfiguration)
-    .build()
-  private val dynamoDB = new DynamoDB(client)
 
   private val config = Configuration.from(
     Map(
@@ -37,12 +29,14 @@ class BadgesDynamoRepositoryITSpec extends WordSpecLike {
       val badgeImageUrl = "http://img.png"
       val timestamp = Instant.now()
 
-      val badgeRepository = new BadgeDynamoRepository(config)
+      val badgeRepository = new BadgeDynamoRepository(config) with LocalDynamo
       badgeRepository.persist(Badge(badgeName, badgeImageUrl, from, to, timestamp, repo))
     }
 
     "query badges by receiver" in {
-      new BadgeDynamoRepository(config).findBadgesReceivedByUser("IlyaZinkovich")
+      val repository = new BadgeDynamoRepository(config) with LocalDynamo
+
+      repository.findBadgesReceivedByUser("IlyaZinkovich")
     }
   }
 

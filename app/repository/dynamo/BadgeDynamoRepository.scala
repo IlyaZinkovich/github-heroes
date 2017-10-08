@@ -3,29 +3,19 @@ package repository.dynamo
 import java.time.Instant
 import javax.inject.{Inject, Singleton}
 
-import com.amazonaws.client.builder.AwsClientBuilder
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
 import com.amazonaws.services.dynamodbv2.document.internal.IteratorSupport
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap
-import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item, QueryOutcome}
+import com.amazonaws.services.dynamodbv2.document.{Item, QueryOutcome}
 import model.{Badge, GitHubRepo, GitHubUser}
 import play.api.Configuration
 import repository.BadgeRepository
 
 @Singleton
 class BadgeDynamoRepository @Inject()(configuration: Configuration) extends BadgeRepository {
+  this: Dynamo =>
 
-  private val endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(
-    configuration.get[String]("dynamo.endpoint"),
-    configuration.get[String]("dynamo.region")
-  )
-
-  private val client = AmazonDynamoDBClientBuilder.standard()
-    .withEndpointConfiguration(endpointConfiguration)
-    .build()
-
-  private val dynamoDB = new DynamoDB(client)
+  private val dynamoDB = getDynamoDB(configuration)
 
   def persist(badge: Badge): Unit = {
     val badgesTable = dynamoDB.getTable("github-badges")
