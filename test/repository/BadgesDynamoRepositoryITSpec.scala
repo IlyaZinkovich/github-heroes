@@ -19,32 +19,31 @@ class BadgesDynamoRepositoryITSpec extends WordSpecLike {
     .withEndpointConfiguration(endpointConfiguration)
     .build()
   private val dynamoDB = new DynamoDB(client)
-  private val badgesTable = dynamoDB.getTable("Badges")
+
+  private val config = Configuration.from(
+    Map(
+      "dynamo.endpoint" -> dynamoEndpoint,
+      "dynamo.region" -> dynamoRegion
+    )
+  )
 
   "BadgesDynamoRepository" should {
 
     "persist badges" in {
       val from = GitHubUser(1, "1", "1.img")
-      val to = GitHubUser(2, "2", "2.img")
+      val to = GitHubUser(2, "IlyaZinkovich", "2.img")
       val repo = GitHubRepo(1, "repo", "http://repo.url", 1, 2, 3)
       val badgeName = "awesome"
       val badgeImageUrl = "http://img.png"
       val timestamp = Instant.now()
 
-      val config = Configuration.from(
-        Map(
-          "dynamo.endpoint" -> dynamoEndpoint,
-          "dynamo.region" -> dynamoRegion
-        )
-      )
-
-      new BadgeDynamoRepository(config).persist(Badge(badgeName, badgeImageUrl, from, to, timestamp, repo))
-
-      val item = badgesTable.getItem(new PrimaryKey("ID", timestamp.toString))
-
-      assert(item.get("badge_name") == badgeName)
+      val badgeRepository = new BadgeDynamoRepository(config)
+      badgeRepository.persist(Badge(badgeName, badgeImageUrl, from, to, timestamp, repo))
     }
 
+    "query badges by receiver" in {
+      new BadgeDynamoRepository(config).findBadgesReceivedByUser("IlyaZinkovich")
+    }
   }
 
 }
