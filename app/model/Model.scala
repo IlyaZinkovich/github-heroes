@@ -16,14 +16,15 @@ object PullRequestAction {
     ) (PullRequestAction.apply _)
 }
 
-case class PullRequest(isMerged: Boolean, commentsUrl: String, user: GitHubUser)
+case class PullRequest(isMerged: Boolean, requestedBy: GitHubUser, mergedBy: Option[GitHubUser], commentsUrl: String)
 
 object PullRequest {
 
   implicit val pullRequestReads: Reads[PullRequest] = (
     (JsPath \ "merged").read[Boolean] and
-      (JsPath \ "comments_url").read[String] and
-      (JsPath \ "merged_by").read[GitHubUser]
+      (JsPath \ "user").read[GitHubUser] and
+      (JsPath \ "merged_by").readNullable[GitHubUser] and
+      (JsPath \ "comments_url").read[String]
     ) (PullRequest.apply _)
 }
 

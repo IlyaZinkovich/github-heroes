@@ -17,7 +17,10 @@ class HeroCommentsDetector extends Actor {
   }
 
   def userMatchesReviewer(comment: Comment, pullRequest: PullRequest): Boolean = {
-    comment.user == pullRequest.user
+    pullRequest.mergedBy match {
+      case Some(mergedByUser) => comment.user == mergedByUser
+      case _ => false
+    }
   }
 
   def commentStartsWithHero(comment: Comment): Boolean = {
